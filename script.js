@@ -27,6 +27,18 @@ tasks.forEach((task, index) => {
 updateStatus()
 
 
+button.addEventListener('click', (e) => {
+    e.preventDefault()
+    const index = tasks.push({
+        title: input.value,
+        done: false
+    }) - 1
+    totalOngoing += 1
+    buildTask(input.value, index)
+    saveFromLocal()
+})
+
+
 function updateStatus() {
     taskTotalEl.innerHTML = tasks.length
     taskDoneEl.innerHTML = totalDone.toString()
@@ -110,14 +122,3 @@ function buildTask(title, index) {
     taskListEl.append(div)
     updateStatus()
 }
-
-button.addEventListener('click', (e) => {
-    e.preventDefault()
-    const index = tasks.push({
-        title: input.value,
-        done: false
-    }) - 1
-    totalOngoing += 1
-    buildTask(input.value, index)
-    saveFromLocal()
-})
