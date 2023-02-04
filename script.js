@@ -63,7 +63,6 @@ function buildTask(title, index) {
 
 button.addEventListener('click', (e) => {
     e.preventDefault()
-    // console.log(tasks)
     const index = tasks.push({
         title: input.value,
         done: false
