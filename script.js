@@ -8,7 +8,7 @@ let tasks = [
         done: false
     }
 ]
-
+// 
 // hapus semua data di localStorage
 // localStorage.clear()
 
