@@ -1,6 +1,11 @@
 const taskListEl = document.getElementById("task-list")
 const input = document.getElementById("add-input")
 const button = document.getElementById("add")
+const taskTotalEl = document.getElementById("task-total")
+const taskDoneEl = document.getElementById("task-done")
+const taskOngoingEl = document.getElementById('task-ongoing')
+let totalDone = 0;
+let totalOngoing = 0;
 
 let tasks = [
     {
@@ -8,15 +13,25 @@ let tasks = [
         done: false
     }
 ]
-// 
+
 // hapus semua data di localStorage
 // localStorage.clear()
 
 loadFromLocal()
 
 tasks.forEach((task, index) => {
+    task.done ? totalDone += 1 : totalOngoing += 1
     buildTask(task.title, index)
 })
+
+updateStatus()
+
+
+function updateStatus() {
+    taskTotalEl.innerHTML = tasks.length
+    taskDoneEl.innerHTML = totalDone.toString()
+    taskOngoingEl.innerHTML = totalOngoing.toString()
+}
 
 
 function loadFromLocal() {
@@ -26,7 +41,22 @@ function loadFromLocal() {
     if (!json) return
 
     tasks = JSON.parse(json)
-    
+
+}
+
+function saveFromLocal() {
+    localStorage.setItem('tasks', JSON.stringify(tasks))
+}
+
+function refreshTask() {
+    taskListEl.innerHTML = ''
+    totalDone = 0
+    totalOngoing = 0
+    updateStatus()
+    tasks.forEach((task, index) => {
+        task.done ? totalDone += 1 : totalOngoing += 1
+        buildTask(task.title, index)
+    })
 }
 
 function buildTask(title, index) {
@@ -40,6 +70,24 @@ function buildTask(title, index) {
     checkbox.classList.add('task__check')
     checkbox.setAttribute('type', 'checkbox')
     checkbox.id = `task-${index}__check`
+    tasks[index].done ? checkbox.checked = true : checkbox.checked = false
+
+    checkbox.addEventListener('click', (e) => {
+
+        if (!tasks[index].done) {
+            tasks[index].done = true
+            totalDone += 1
+            totalOngoing -= 1
+        }
+        else {
+            tasks[index].done = false
+            totalDone -= 1
+            totalOngoing += 1
+        }
+
+        saveFromLocal()
+        updateStatus()
+    })
 
     label.classList.add('task__title')
     label.setAttribute('for', `task-${index}__check`)
@@ -51,7 +99,8 @@ function buildTask(title, index) {
     deleteBtn.addEventListener('click', (e) => {
         tasks.splice(index, 1);
         taskListEl.removeChild(div);
-        localStorage.setItem('tasks', JSON.stringify(tasks))
+        saveFromLocal()
+        refreshTask()
     })
 
     div.appendChild(checkbox)
@@ -59,6 +108,7 @@ function buildTask(title, index) {
     div.appendChild(deleteBtn)
 
     taskListEl.append(div)
+    updateStatus()
 }
 
 button.addEventListener('click', (e) => {
@@ -67,7 +117,7 @@ button.addEventListener('click', (e) => {
         title: input.value,
         done: false
     }) - 1
-
+    totalOngoing += 1
     buildTask(input.value, index)
-    localStorage.setItem('tasks', JSON.stringify(tasks))
+    saveFromLocal()
 })
